@@ -1,6 +1,8 @@
 import { collection, query, where, getDocs, updateDoc, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { redirect } from 'next/navigation';
+import React from "react";
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
 interface Props {
     params: { slug: string };
@@ -11,7 +13,16 @@ export default async function SlugRedirect({ params }: Props) {
     const querySnapshot = await getDocs(q);
 
     if (querySnapshot.empty) {
-        return <h1>URL Not Found</h1>;
+        return (
+            <Card>
+                <CardHeader>
+                    <CardTitle>URL Not Found</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p>The URL you are looking for does not exist.</p>
+                </CardContent>
+            </Card>
+        );
     }
 
     const urlDoc = querySnapshot.docs[0];
