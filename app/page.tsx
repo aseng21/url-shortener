@@ -1,11 +1,21 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import "@fortawesome/fontawesome-free/css/all.css";
 
 export default function Home() {
     const [shortenedUrl, setShortenedUrl] = useState<string | null>(null);
+    const [shortenedUrls, setShortenedUrls] = useState<string[]>([]);
+
+    useEffect(() => {
+        // Fetch the list of shortened URLs from localStorage when the component mounts
+        const storedUrls = localStorage.getItem('shortenedUrls');
+        if (storedUrls) {
+            setShortenedUrls(JSON.parse(storedUrls));
+        }
+    }, []);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -24,8 +34,10 @@ export default function Home() {
         const result = await response.json();
         if (response.ok) {
             setShortenedUrl(result.shortenedUrl);
+            const updatedUrls = [...shortenedUrls, result.shortenedUrl];
+            setShortenedUrls(updatedUrls);
+            localStorage.setItem('shortenedUrls', JSON.stringify(updatedUrls));
         } else {
-            // Handle error
             console.error(result.error);
         }
     };
@@ -78,8 +90,21 @@ export default function Home() {
                             <p>Shortened URL: <a href={shortenedUrl} className="text-blue-600 underline">{shortenedUrl}</a></p>
                         </div>
                     )}
+                    {shortenedUrls.length > 0 && (
+                        <div className="mt-4">
+                            <h2 className="text-lg font-medium text-gray-700">Your Shortened URLs:</h2>
+                            <ul className="list-none space-y-2">
+                                {shortenedUrls.map((url, index) => (
+                                    <li key={index} className="flex items-center">
+                                        <i className="fas fa-link text-indigo-600 mr-2"></i>
+                                        <a href={url} className="text-blue-600 underline">{url}</a>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
         </div>
-    );
+    )
 }
