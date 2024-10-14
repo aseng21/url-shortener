@@ -24,10 +24,11 @@ export default function Navbar() {
                 <Link href="/" className="text-white text-2xl font-bold">URL Shortener</Link>
                 <div>
                     {user ? (
-                        <>
-                            <span className="text-white mr-4">{user.email}</span>
+                        <div className="flex items-center">
+                            <span className="text-white mr-4">Welcome, {user.displayName || user.email}</span>
+                            <Link href="/dashboard" className="text-white mr-4">Dashboard</Link>
                             <button onClick={handleLogout} className="text-white">Logout</button>
-                        </>
+                        </div>
                     ) : (
                         <>
                             <Link href="/login" className="text-white mr-4">Login</Link>
