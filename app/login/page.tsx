@@ -1,11 +1,11 @@
 'use client';
 import React, { useState } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
-import {Input} from "@/components/ui/input";
-import {Button} from "@/components/ui/button";
-import { auth } from '@/lib/firebase';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { auth, googleProvider } from '@/lib/firebase';
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -20,6 +20,15 @@ export default function Login() {
             router.push('/dashboard');
         } catch (err) {
             setError('Failed to log in. Please check your credentials.');
+        }
+    };
+
+    const handleGoogleSignIn = async () => {
+        try {
+            await signInWithPopup(auth, googleProvider);
+            router.push('/dashboard');
+        } catch (error) {
+            console.error('Error signing in with Google:', error);
         }
     };
 
@@ -72,6 +81,12 @@ export default function Login() {
                             Log In
                         </Button>
                     </form>
+                    <Button
+                        onClick={handleGoogleSignIn}
+                        className="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 rounded-md mt-4"
+                    >
+                        Sign in with Google
+                    </Button>
                 </CardContent>
             </Card>
         </div>

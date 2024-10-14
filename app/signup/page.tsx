@@ -1,11 +1,11 @@
 'use client';
 import React, { useState } from 'react';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
-import {Input} from "@/components/ui/input";
-import {Button} from "@/components/ui/button";
-import {auth} from "@/lib/firebase";
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { auth, googleProvider } from '@/lib/firebase';
 
 export default function Signup() {
     const [email, setEmail] = useState('');
@@ -20,6 +20,15 @@ export default function Signup() {
             router.push('/dashboard');
         } catch (err) {
             setError('Failed to sign up. Please try again.');
+        }
+    };
+
+    const handleGoogleSignIn = async () => {
+        try {
+            await signInWithPopup(auth, googleProvider);
+            router.push('/dashboard');
+        } catch (error) {
+            console.error('Error signing in with Google:', error);
         }
     };
 
@@ -72,6 +81,12 @@ export default function Signup() {
                             Sign Up
                         </Button>
                     </form>
+                    <Button
+                        onClick={handleGoogleSignIn}
+                        className="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 rounded-md mt-4"
+                    >
+                        Sign up with Google
+                    </Button>
                 </CardContent>
             </Card>
         </div>
