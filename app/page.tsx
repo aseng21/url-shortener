@@ -4,13 +4,13 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import "@fortawesome/fontawesome-free/css/all.css";
+import { shortenUrl } from '@/lib/shortenUrl';
 
 export default function Home() {
     const [shortenedUrl, setShortenedUrl] = useState<string | null>(null);
     const [shortenedUrls, setShortenedUrls] = useState<string[]>([]);
 
     useEffect(() => {
-        // Fetch the list of shortened URLs from localStorage when the component mounts
         const storedUrls = localStorage.getItem('shortenedUrls');
         if (storedUrls) {
             setShortenedUrls(JSON.parse(storedUrls));
@@ -22,23 +22,17 @@ export default function Home() {
         const formData = new FormData(event.currentTarget);
         const originalUrl = formData.get('originalUrl') as string;
         const customSlug = formData.get('customSlug') as string;
+        const expirationDate = formData.get('expirationDate') as string;
 
-        const response = await fetch('/api/shorten', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ originalUrl, customSlug }),
-        });
-
-        const result = await response.json();
-        if (response.ok) {
-            setShortenedUrl(result.shortenedUrl);
-            const updatedUrls = [...shortenedUrls, result.shortenedUrl];
+        try {
+            const shortenedUrl = await shortenUrl(originalUrl, customSlug, expirationDate);
+            setShortenedUrl(shortenedUrl);
+            const updatedUrls = [...shortenedUrls, shortenedUrl];
             setShortenedUrls(updatedUrls);
             localStorage.setItem('shortenedUrls', JSON.stringify(updatedUrls));
-        } else {
-            console.error(result.error);
+        } catch (error) {
+            // @ts-expect-error
+            console.error(error.message);
         }
     };
 
@@ -78,6 +72,17 @@ export default function Home() {
                                 placeholder="Enter a custom slug"
                             />
                         </div>
+                        <div>
+                            <label htmlFor="expirationDate" className="block text-sm font-medium text-gray-700">
+                                Expiration Date (optional)
+                            </label>
+                            <Input
+                                type="date"
+                                id="expirationDate"
+                                name="expirationDate"
+                                className="mt-1 block w-full"
+                            />
+                        </div>
                         <Button
                             type="submit"
                             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-md"
@@ -106,5 +111,5 @@ export default function Home() {
                 </CardContent>
             </Card>
         </div>
-    )
+    );
 }
