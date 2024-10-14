@@ -31,7 +31,7 @@ export default function Home() {
             setShortenedUrls(updatedUrls);
             localStorage.setItem('shortenedUrls', JSON.stringify(updatedUrls));
         } catch (error) {
-            // @ts-expect-error
+            // @ts-expect-error any
             console.error(error.message);
         }
     };
